@@ -34,13 +34,13 @@ const RecipeDetails = () => {
     return(
         <>
             <h1>{thisRecipe?.Name}</h1>
-
+            <h2>Nutrition</h2>
             {templateNutrition && thisRecipe ?
                 <NutritionDetailsPane templates={templateNutrition} Name={thisRecipe?.Name} />
                 :
                 <h2>Loading Nutrition...</h2>
             }
-
+            <h2>Ingredients</h2>
             {ingredients ?
                 <IngredientsDisplay ingredients={ingredients} />
                 :
