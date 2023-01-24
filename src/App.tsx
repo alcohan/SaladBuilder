@@ -1,57 +1,24 @@
+import { Routes, Route } from 'react-router-dom';
 import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+
+import Navigation from './routes/Navigation.component';
+import Home from './routes/Home.component';
+import RecipesPage from './routes/Recipes.component';
+import RecipeDetails from './routes/RecipeDetails.component';
+import TemplatesPage from './routes/Templates.component';
+import IngredientsPage from './routes/Ingredients.component';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
+    <Routes>
+      <Route path='/*' element={<Navigation />}>
+        <Route index element={<Home />} />
+        <Route path='recipes' element={<RecipesPage />} />
+        <Route path='recipes/:recipe_id' element={<RecipeDetails />}/>
+        <Route path='templates' element={<TemplatesPage />} />
+        <Route path='ingredients' element={<IngredientsPage />} />
+      </Route>
+    </Routes>
   );
 }
 
