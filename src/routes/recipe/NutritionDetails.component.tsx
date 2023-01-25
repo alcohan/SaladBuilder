@@ -12,7 +12,7 @@ const NutritionDetailsPane: React.FC<NutritionDetailsProps> = (props) => {
         props.templates.map((row) => ({id: row.TemplateID, ...row}))
     
     const rowHeight = 40;
-    const tableHeight = rows.length * rowHeight + 128 + 35 // rows * rowHeight + Title buffer + export button buffer
+    const tableHeight = rows.length * rowHeight + 75 + 35 // rows * rowHeight + Title buffer + export button buffer
     
     const columns: GridColDef[] = [
         { field: 'Template', headerName: 'Name', width: 150 },
@@ -47,6 +47,7 @@ const NutritionDetailsPane: React.FC<NutritionDetailsProps> = (props) => {
                 columns={columns} 
                 components={{Toolbar: CustomToolbar}}
                 rowHeight={rowHeight}
+                hideFooter={true}
                 />
         </div>
     )

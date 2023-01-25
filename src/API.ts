@@ -12,7 +12,6 @@ export const deleteRecipeIngredient = (recipeIngredientID: number) => {
     }
 
     return fetch(requestUrl(`/recipes/temp/ingredients/temp/${recipeIngredientID}`), requestOptions)
-        // .then(response => response.json())
 }
 
 export const createRecipeIngredient = (recipeID: number, ingredientID: number) => {
@@ -21,14 +20,11 @@ export const createRecipeIngredient = (recipeID: number, ingredientID: number) =
         ingredientid: ingredientID,
         qty: 1
     }
+
     const requestOptions = {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        data: JSON.stringify(createRecipeIngredientData)
+        body: JSON.stringify(createRecipeIngredientData)
     }
-    let result;
-    fetch(requestUrl(`/recipes/${recipeID}/ingredients`), requestOptions)
-        .then(response => response.json())
-        .then(data => result=data)
-    return result;
+    return fetch(requestUrl(`/recipes/${recipeID}/ingredients`), requestOptions)
 }

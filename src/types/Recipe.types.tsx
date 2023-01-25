@@ -23,11 +23,37 @@ export interface TemplateNutrition extends BaseNutrition {
     Price: number;
 }
 
-export interface RecipeIngredient {
+export interface BaseIngredient {
     Name: string;
-    Quantity: number
-    RecipeIngredientID: number;
     IngredientID: number;
     Category: string;
 }
 
+export interface RecipeIngredient extends BaseIngredient {
+    Quantity: number
+    RecipeIngredientID: number;
+}
+
+export interface IngredientCatalog extends BaseIngredient {
+    Calories: number;
+    CarbohydratesGrams: number;
+    CasePrice: number;
+    CaseSize: number;
+    CategoryID: number;
+    CholesterolMiligrams: number;
+    FiberGrams: number;
+    ImageURL: number;
+    IngredientID: number;
+    PortionCost: number;
+    PortionSize: number;
+    PortionUtensil: number;
+    PortionVolume: number;
+    PortionWeight: number;
+    ProteinGrams: number;
+    SatFatGrams: number;
+    SodiumMiligrams: number;
+    SugarGrams: number;
+    TTLFatGrams: number;
+    Unit: string;
+    YieldPercent: number;
+}

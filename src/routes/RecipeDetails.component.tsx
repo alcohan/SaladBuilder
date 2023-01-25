@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 import { useParams } from "react-router"
 
-import { requestUrl } from "../API"
-import { Recipe, TemplateNutrition, RecipeIngredient } from '../types/Recipe.types'
+import { createRecipeIngredient, requestUrl } from "../API"
+import { Recipe, TemplateNutrition, RecipeIngredient, IngredientCatalog } from '../types/Recipe.types'
 import IngredientsDisplay from "./recipe/IngredientsDisplay.component"
 import NutritionDetailsPane from "./recipe/NutritionDetails.component"
 
@@ -10,6 +10,7 @@ const RecipeDetails = () => {
     const [thisRecipe, setThisRecipe] = useState<Recipe>()
     const [templateNutrition, setTemplateNutrition] = useState<TemplateNutrition[]>()
     const [ingredients, setIngredients] = useState<RecipeIngredient[]>()
+    const [ingredientsCatalog, setIngredientsCatalog ] = useState<IngredientCatalog[]>()
     const params = useParams()
 
     useEffect( () => {
@@ -28,8 +29,23 @@ const RecipeDetails = () => {
         .then(data => {
             setIngredients(data satisfies RecipeIngredient[])
         })
+        fetch(requestUrl(`/ingredients`))
+        .then(response => response.json())
+        .then(data => {
+            // const categories = [... new Set<string>(data.map(item => item.Category))];
+            setIngredientsCatalog(data satisfies IngredientCatalog[])
+        })
     }
     ,[])
+
+    const addIngredientHandler = (ingredientID: number) => {
+        if (thisRecipe){
+            createRecipeIngredient(thisRecipe.RecipeID,ingredientID)
+        }
+        else {
+            throw new Error("RecipeID is not loaded");
+        }
+    }
 
     return(
         <>
@@ -41,8 +57,15 @@ const RecipeDetails = () => {
                 <h2>Loading Nutrition...</h2>
             }
             <h2>Ingredients</h2>
-            {ingredients ?
-                <IngredientsDisplay ingredients={ingredients} />
+            {ingredients && ingredientsCatalog ?
+                <>
+                    <IngredientsDisplay ingredients={ingredients} catalog={ingredientsCatalog} addIngredientHandler={addIngredientHandler}/>
+                    {/* <Button variant="outlined" 
+                        onClick={() => 
+                            addIngredientHandler(11)
+                        }
+                        ><Add /> Add</Button> */}
+                </>
                 :
                 <h2>Loading Ingredients...</h2>
             }
