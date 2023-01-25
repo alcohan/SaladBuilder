@@ -10,7 +10,7 @@ import { deleteRecipeIngredient } from "../../API";
 interface IngredientsDisplayProps {
     ingredients: RecipeIngredient[];
     catalog: IngredientCatalog[];
-    addIngredientHandler: (id: number) => void;
+    addIngredientHandler: (ingredientid: number) => Promise<number>;
 }
 
 const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
@@ -47,11 +47,6 @@ const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
         p: 4,
       };
 
-    // const AddIngredientModal = (props) => {
-    //     return(        
-
-    //     )
-    // }
     return (
         <TableContainer component={Paper} variant="outlined">
             <Modal
@@ -76,7 +71,9 @@ const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
                                     {props.catalog.map( ingredient => 
                                         ingredient.Category === category? (
                                             <TableRow>
-                                                <TableCell><Button onClick={() => props.addIngredientHandler(ingredient.IngredientID)}><Add/></Button></TableCell>
+                                                <TableCell><Button onClick={() => {
+                                                    props.addIngredientHandler(ingredient.IngredientID)
+                                                    }}><Add/></Button></TableCell>
                                                 <TableCell>{ingredient.Name}</TableCell>
                                             </TableRow>
                                             )
@@ -107,8 +104,8 @@ const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
                         </TableRow>
                     ))}
                 </TableBody>
-            <Button onClick={handleOpen} variant="outlined"><Add/>Add</Button>
             </Table>
+            <Button onClick={handleOpen} variant="outlined"><Add/>Add</Button>
         </TableContainer>
     )
 }

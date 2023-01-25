@@ -32,15 +32,17 @@ const RecipeDetails = () => {
         fetch(requestUrl(`/ingredients`))
         .then(response => response.json())
         .then(data => {
-            // const categories = [... new Set<string>(data.map(item => item.Category))];
             setIngredientsCatalog(data satisfies IngredientCatalog[])
         })
     }
     ,[])
 
-    const addIngredientHandler = (ingredientID: number) => {
+    // Add a new ingredient to this recipe and return its new ID
+    const addIngredientHandler = async (ingredientID: number) => {
         if (thisRecipe){
-            createRecipeIngredient(thisRecipe.RecipeID,ingredientID)
+            let result = await createRecipeIngredient(thisRecipe.RecipeID,ingredientID)
+                .then(result => result.json())
+            return result.new_id
         }
         else {
             throw new Error("RecipeID is not loaded");

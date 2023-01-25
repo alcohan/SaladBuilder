@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router";
 
-import { Card, CardContent, Typography } from '@mui/material'
+import { Button, Card, CardContent, Typography } from '@mui/material'
 import { Grid } from '@mui/material'
 
 import { Recipe } from '../types/Recipe.types';
+import { useAppDispatch } from "../app/hooks";
+import { useAppSelector } from "../app/hooks";
+import { loadRecipes, selectRecipes } from "../app/store/recipeSlice";
 
 const RecipesPage = () => {
-    const [recipes, setRecipes] = useState([])
+    const recipes = useAppSelector(selectRecipes);
+    const dispatch = useAppDispatch();
+
     const navigate = useNavigate()
 
     useEffect( () => {
-            fetch('http://192.168.7.122:5000/recipes')
-            .then(response => response.json())
-            .then(data => {
-                setRecipes(data)
-        });
+        dispatch(loadRecipes());
     }
     ,[])
 
@@ -41,7 +42,7 @@ const RecipesPage = () => {
     }
 
     return(
-        <>
+        <>          
             <Typography variant="h3">
                 Recipes
             </Typography>

@@ -1,3 +1,5 @@
+import { IngredientCatalog, Recipe } from "./types/Recipe.types";
+
 const SERVER = 'http://localhost:5000'
 
 export const requestUrl = (url: string) => {
@@ -14,7 +16,7 @@ export const deleteRecipeIngredient = (recipeIngredientID: number) => {
     return fetch(requestUrl(`/recipes/temp/ingredients/temp/${recipeIngredientID}`), requestOptions)
 }
 
-export const createRecipeIngredient = (recipeID: number, ingredientID: number) => {
+export const createRecipeIngredient = async (recipeID: number, ingredientID: number) => {
     console.log("Adding to  " + recipeID + " | ingredientID: "+ ingredientID )
     const createRecipeIngredientData = {
         ingredientid: ingredientID,
@@ -26,5 +28,22 @@ export const createRecipeIngredient = (recipeID: number, ingredientID: number) =
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(createRecipeIngredientData)
     }
-    return fetch(requestUrl(`/recipes/${recipeID}/ingredients`), requestOptions)
+    return await fetch(requestUrl(`/recipes/${recipeID}/ingredients`), requestOptions)
+}
+
+export const fetchIngredientsCatalog = () => {
+    return new Promise<IngredientCatalog[]> ((resolve) =>
+    fetch(requestUrl(`/ingredients`))
+        .then(response => response.json())
+        .then(data => resolve(data as IngredientCatalog[]))
+    )
+    
+}
+export const fetchRecipes = () => {
+    return new Promise<Recipe[]> ((resolve) =>
+    fetch(requestUrl(`/recipes`))
+        .then(response => response.json())
+        .then(data => resolve(data as Recipe[]))
+    )
+    
 }
