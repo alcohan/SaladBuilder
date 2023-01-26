@@ -1,5 +1,4 @@
 import { Routes, Route } from 'react-router-dom';
-import React from 'react';
 
 import Navigation from './routes/Navigation.component';
 import Home from './routes/Home.component';
