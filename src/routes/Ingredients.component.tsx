@@ -1,17 +1,44 @@
-import { Button } from "@mui/material";
+import { Box, Grid, Paper, Typography } from "@mui/material";
+import { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../app/hooks"
-import { loadData, selectIngredientsCatalog, selectIngredientsStatus } from "../app/store/ingredientSlice"
+import { loadData, selectCategories, selectIngredientsCatalog, selectIngredientsStatus } from "../app/store/ingredientSlice"
+import IngredientCard from "./ingredient/IngredientCard.component";
 
 const IngredientsPage = () => {
     const catalog = useAppSelector(selectIngredientsCatalog);
+    const categories = useAppSelector(selectCategories);
     const status = useAppSelector(selectIngredientsStatus);
     const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        dispatch(loadData())
+    },[])
     return(
         <>
-            <h1>This is the Ingredients page</h1>
-            <Button variant="outlined" onClick={() => dispatch(loadData())}>Load</Button>
-            <h2>STATUS: {status}</h2>
-            <br></br>{catalog.map((item) => item.Name)}
+            {categories.map(category => 
+                (<Box sx={{m:2}} >
+                    <Typography 
+                        key={category.CategoryID} 
+                        gutterBottom
+                        variant="h4" 
+                        align="center"
+                        >{category.Name}</Typography>
+                    <Grid container spacing={3}>
+                        {catalog.map( ingredient => 
+                            ingredient.CategoryID === category.CategoryID? (
+                                <Grid key={ingredient.IngredientID} item xs={12} sm={6} md={4} lg={3} xl={2}>
+                                    <IngredientCard
+                                        key={ingredient.IngredientID} 
+                                        {...ingredient}
+                                        />
+                                </Grid>
+                                )
+                                :null
+                        )}
+                    </Grid>
+                </Box>)
+                
+            )}
         </>
     )
 }

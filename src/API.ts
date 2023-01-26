@@ -1,3 +1,4 @@
+import { Category } from "./types/Ingredient.types";
 import { IngredientCatalog, Recipe } from "./types/Recipe.types";
 
 const SERVER = 'http://localhost:5000'
@@ -44,6 +45,14 @@ export const fetchRecipes = () => {
     fetch(requestUrl(`/recipes`))
         .then(response => response.json())
         .then(data => resolve(data as Recipe[]))
+    )
+    
+}
+export const fetchCategories = () => {
+    return new Promise<Category[]> ((resolve) =>
+    fetch(requestUrl(`/ingredients/categories`))
+        .then(response => response.json())
+        .then(data => resolve(data as Category[]))
     )
     
 }
