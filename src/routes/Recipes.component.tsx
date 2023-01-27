@@ -11,14 +11,8 @@ import { loadRecipes, selectRecipes } from "../app/store/recipeSlice";
 
 const RecipesPage = () => {
     const recipes = useAppSelector(selectRecipes);
-    const dispatch = useAppDispatch();
 
     const navigate = useNavigate()
-
-    useEffect( () => {
-        dispatch(loadRecipes());
-    }
-    ,[])
 
     const RecipeCard = (props: Recipe) => {
         return (

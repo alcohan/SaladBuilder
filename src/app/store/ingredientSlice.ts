@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AppThunk, RootState } from '../store';
+import { AppThunk, RootState, store } from '../store';
 
 import { IngredientCatalog } from '../../types/Recipe.types';
 import { fetchCategories, fetchIngredientsCatalog } from '../../API';
@@ -78,8 +78,18 @@ export const ingredientSlice = createSlice({
 
 export const { loadingredients, loadcategories } = ingredientSlice.actions;
 
-export const selectIngredientsCatalog = (state:RootState) => state.ingredients.catalog;
 export const selectIngredientsStatus = (state:RootState) => state.ingredients.status;
-export const selectCategories = (state:RootState) => state.ingredients.categories;
+export const selectCategories = (state:RootState) => {
+    if(state.ingredients.status === 'idle' && state.ingredients.categories.length === 0) {
+        store.dispatch(loadCategories());
+    }
+    return state.ingredients.categories;
+}
+export const selectIngredientsCatalog = (state:RootState) => {
+    if(state.ingredients.status === 'idle' && state.ingredients.catalog.length === 0) {
+        store.dispatch(loadIngredientsCatalog());
+    }
+    return state.ingredients.catalog
+};
 
 export default ingredientSlice.reducer;

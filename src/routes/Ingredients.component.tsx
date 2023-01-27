@@ -24,9 +24,9 @@ const IngredientsPage = () => {
         }))
     }
 
-    useEffect(() => {
-        dispatch(loadData())
-    },[])
+    // useEffect(() => {
+    //     dispatch(loadData())
+    // },[])
 
     useEffect(() => {
         handleSearch(searchTerm)

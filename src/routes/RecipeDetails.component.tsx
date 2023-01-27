@@ -3,38 +3,28 @@ import { useEffect, useState } from "react"
 import { useParams } from "react-router"
 
 import { createRecipeIngredient, requestUrl } from "../API"
+import { useAppDispatch, useAppSelector } from "../app/hooks"
+import { selectIngredientsCatalog } from "../app/store/ingredientSlice"
+import { loadRecipeIngredients, loadTemplateData, selectOneRecipe } from "../app/store/recipeSlice"
 import { Recipe, TemplateNutrition, RecipeIngredient, IngredientCatalog } from '../types/Recipe.types'
 import IngredientsDisplay from "./recipe/IngredientsDisplay.component"
 import NutritionDetailsPane from "./recipe/NutritionDetails.component"
 
 const RecipeDetails = () => {
-    const [thisRecipe, setThisRecipe] = useState<Recipe>()
-    const [templateNutrition, setTemplateNutrition] = useState<TemplateNutrition[]>()
-    const [ingredients, setIngredients] = useState<RecipeIngredient[]>()
-    const [ingredientsCatalog, setIngredientsCatalog ] = useState<IngredientCatalog[]>()
+    // const [templateNutrition, setTemplateNutrition] = useState<TemplateNutrition[]>()
+    // const [ingredients, setIngredients] = useState<RecipeIngredient[]>()
+
+    const dispatch = useAppDispatch()
     const params = useParams()
+    
+    const thisRecipe = useAppSelector(selectOneRecipe(Number(params.recipe_id)))
+    const ingredientsCatalog = useAppSelector(selectIngredientsCatalog)
+    const templateNutrition = thisRecipe?.templates
+    const ingredients = thisRecipe?.ingredients
 
     useEffect( () => {
-        fetch(requestUrl(`/recipes/${params.recipe_id}`))
-        .then(response => response.json())
-        .then(data => {
-            setThisRecipe(data[0] satisfies Recipe)
-        });
-        fetch(requestUrl(`/recipes/${params.recipe_id}/templates`))
-        .then(response => response.json())
-        .then(data => {
-            setTemplateNutrition(data satisfies Recipe[])
-        })
-        fetch(requestUrl(`/recipes/${params.recipe_id}/ingredients`))
-        .then(response => response.json())
-        .then(data => {
-            setIngredients(data satisfies RecipeIngredient[])
-        })
-        fetch(requestUrl(`/ingredients`))
-        .then(response => response.json())
-        .then(data => {
-            setIngredientsCatalog(data satisfies IngredientCatalog[])
-        })
+        dispatch(loadTemplateData(Number(params.recipe_id)))
+        dispatch(loadRecipeIngredients(Number(params.recipe_id)))
     }
     ,[])
 
@@ -54,7 +44,7 @@ const RecipeDetails = () => {
         <>
             <Typography variant="h3" component="h1">
                 {thisRecipe?.Name}
-                <Avatar onClick={() => window.prompt("Enter new image URL: ")}
+                <Avatar onClick={() => window.prompt("This will eventually update image url: ")}
                     alt={thisRecipe?.Name} 
                     src={thisRecipe?.ImageURL} 
                     sx={{width:120, height:120}}

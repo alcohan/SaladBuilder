@@ -1,5 +1,5 @@
 import { Category } from "./types/Ingredient.types";
-import { IngredientCatalog, Recipe } from "./types/Recipe.types";
+import { IngredientCatalog, Recipe, RecipeIngredient, TemplateNutrition } from "./types/Recipe.types";
 
 const SERVER = 'http://localhost:5000'
 
@@ -45,6 +45,22 @@ export const fetchRecipes = () => {
     fetch(requestUrl(`/recipes`))
         .then(response => response.json())
         .then(data => resolve(data as Recipe[]))
+    )
+    
+}
+export const fetchRecipeTemplateData = (recipe_id: number) => {
+    return new Promise<{id: number, data: TemplateNutrition[]}> ((resolve) =>
+    fetch(requestUrl(`/recipes/${recipe_id}/templates`))
+        .then(response => response.json())
+        .then(data => resolve({id: recipe_id, data: data as TemplateNutrition[]}))
+    )
+    
+}
+export const fetchRecipeIngredients = (recipe_id: number) => {
+    return new Promise<{id: number, data: RecipeIngredient[]}> ((resolve) =>
+    fetch(requestUrl(`/recipes/${recipe_id}/ingredients`))
+        .then(response => response.json())
+        .then(data => resolve({id: recipe_id, data: data as RecipeIngredient[]}))
     )
     
 }
