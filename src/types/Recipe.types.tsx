@@ -15,6 +15,7 @@ export interface Recipe extends BaseNutrition {
     RecipeID:number;
     Price:number;
     IngredientQty:number;
+    ImageURL: string;
 }
 
 export interface TemplateNutrition extends BaseNutrition {
@@ -35,15 +36,13 @@ export interface RecipeIngredient extends BaseIngredient {
 }
 
 export interface IngredientCatalog extends BaseIngredient {
+    ImageURL: number;
+    CategoryID: number;
+
     Calories: number;
     CarbohydratesGrams: number;
-    CasePrice: number;
-    CaseSize: number;
-    CategoryID: number;
     CholesterolMiligrams: number;
     FiberGrams: number;
-    ImageURL: number;
-    IngredientID: number;
     PortionCost: number;
     PortionSize: number;
     PortionUtensil: number;
@@ -54,6 +53,11 @@ export interface IngredientCatalog extends BaseIngredient {
     SodiumMiligrams: number;
     SugarGrams: number;
     TTLFatGrams: number;
-    Unit: string;
+
+    CasePrice: number;
+    CaseSize: number;
+    PortionsPerCase: number;
     YieldPercent: number;
+
+    Unit: string;
 }

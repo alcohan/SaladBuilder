@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useNavigate } from "react-router";
 
-import { Button, Card, CardContent, Typography } from '@mui/material'
+import { Avatar, Card, CardContent, CardMedia, Typography } from '@mui/material'
 import { Grid } from '@mui/material'
 
 import { Recipe } from '../types/Recipe.types';
@@ -23,20 +23,38 @@ const RecipesPage = () => {
     const RecipeCard = (props: Recipe) => {
         return (
             <Card variant="outlined" onClick={() => navigate(`/recipes/${props.RecipeID}`)}>
-                <CardContent>
-                    <Typography variant="h5">
-                        {props.Name}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                        Base price $ {props.Price.toFixed(2)}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                        {props.IngredientQty} Ingredients
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                        Base ingredients {props.Calories.toFixed(0)} cal
-                    </Typography>
-                </CardContent>
+                <Grid container>
+                    <Grid item xs={8}>
+                        <CardContent>
+                            <Typography gutterBottom variant="h5" component="h2">
+                                {props.Name}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                Base price $ {props.Price.toFixed(2)}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                {props.IngredientQty} Ingredients
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                Base ingredients {props.Calories.toFixed(0)} cal
+                            </Typography>
+                        </CardContent>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <Avatar component={CardMedia}
+                            src={props.ImageURL? props.ImageURL : "localhost/error.jpg"} 
+                            alt={props.Name} 
+                            sx={{width:80, height:80, m:1}}
+                            />
+                        {/* <CardMedia
+                            component="img"
+                            alt="thumbnail"
+                            image={props.ImageURL}
+                            title={props.Name}
+                            // height="140"
+                            /> */}
+                    </Grid>
+                </Grid>
             </Card>
         )
     }

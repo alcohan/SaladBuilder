@@ -5,7 +5,9 @@ import { useNavigate } from "react-router";
 const IngredientCard = (props: IngredientCatalog) => {
     const navigate = useNavigate();
     return (
-        <Card variant="outlined" >
+        <Card 
+            elevation={2}
+            >
             <CardActionArea
                 onClick={() => navigate(`/ingredients/${props.IngredientID}`)}
             >
@@ -13,6 +15,7 @@ const IngredientCard = (props: IngredientCatalog) => {
                     <Typography sx={{fontSize:14}} color="text.secondary">Ingredient</Typography>
                     <Typography variant="h5" gutterBottom >{props.Name}</Typography>
                     <Typography variant="body1">$ {props.PortionCost.toFixed(2)} per portion</Typography>
+                    <Typography variant="body1">yield {props.PortionsPerCase} per case</Typography>
                 </CardContent>
             </CardActionArea>
         </Card>

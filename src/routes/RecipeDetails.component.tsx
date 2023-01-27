@@ -1,3 +1,4 @@
+import { Avatar, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useParams } from "react-router"
 
@@ -51,7 +52,14 @@ const RecipeDetails = () => {
 
     return(
         <>
-            <h1>{thisRecipe?.Name}</h1>
+            <Typography variant="h3" component="h1">
+                {thisRecipe?.Name}
+                <Avatar onClick={() => window.prompt("Enter new image URL: ")}
+                    alt={thisRecipe?.Name} 
+                    src={thisRecipe?.ImageURL} 
+                    sx={{width:120, height:120}}
+                    />
+            </Typography>
             <h2>Nutrition</h2>
             {templateNutrition && thisRecipe ?
                 <NutritionDetailsPane templates={templateNutrition} Name={thisRecipe?.Name} />

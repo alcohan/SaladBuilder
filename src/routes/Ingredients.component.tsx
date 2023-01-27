@@ -1,28 +1,50 @@
-import { Box, FormControlLabel, FormGroup, Grid, Paper, Switch, TableContainer, Typography } from "@mui/material";
+import { Box, FormControlLabel, FormGroup, Grid, Paper, Switch, TextField, Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridRowsProp, GridToolbarContainer, GridToolbarExport } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { useAppSelector, useAppDispatch } from "../app/hooks"
 import { loadData, selectCategories, selectIngredientsCatalog, selectIngredientsStatus } from "../app/store/ingredientSlice"
 import IngredientCard from "./ingredient/IngredientCard.component";
+import SearchBox from "./ingredient/SearchBox.component";
 
 const IngredientsPage = () => {
-    const catalog = useAppSelector(selectIngredientsCatalog);
+    const catalogMaster = useAppSelector(selectIngredientsCatalog);
+    const [catalog, setCatalog] = useState(catalogMaster)
     const categories = useAppSelector(selectCategories);
     const status = useAppSelector(selectIngredientsStatus);
-    const [tableDisplay, setTableDisplay] = useState(false)
+    const [tableDisplay, setTableDisplay] = useState(false);
     const dispatch = useAppDispatch();
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const handleSearch = (term: string) => {
+        setSearchTerm(term);
+        const lowerCaseTerm = term.toLowerCase();
+        setCatalog(catalogMaster.filter((item) => {
+            const lowerCaseName = item.Name.toLowerCase().replace(/[^a-zA-Z0-9]/g,"");
+            return lowerCaseName.includes(lowerCaseTerm)
+        }))
+    }
 
     useEffect(() => {
         dispatch(loadData())
     },[])
 
+    useEffect(() => {
+        handleSearch(searchTerm)
+    },[catalogMaster])
+
     const CardDisplay = () => {
         return(
             <>
                 {categories.map(category => 
-                    (<Box sx={{m:2}} >
+                    (<Paper sx={{
+                            m:2, 
+                            p:3, 
+                            background:category.ColorHex?category.ColorHex:'#dcdcdc'
+                        }} 
+                        key={category.CategoryID} 
+                        elevation={2}
+                        >
                         <Typography 
-                            key={category.CategoryID} 
                             gutterBottom
                             variant="h4" 
                             align="center"
@@ -40,7 +62,7 @@ const IngredientsPage = () => {
                                     :null
                             )}
                         </Grid>
-                    </Box>)
+                    </Paper>)
                     
                 )}
             </>
@@ -62,6 +84,7 @@ const IngredientsPage = () => {
             { field: 'CaseSize', headerName: 'Case Total', width: 100},
             { field: 'Unit', headerName: 'Unit', width: 100},
             { field: 'YieldPercent', headerName: 'Yield %', width: 100},
+            { field: 'PortionsPerCase', headerName: 'Per Case', width: 100},
         ];
         function CustomToolbar() {
             const csvOptions={
@@ -93,14 +116,23 @@ const IngredientsPage = () => {
     
     return(
         <>
-            <FormGroup >
-                <FormControlLabel control={
-                <Switch
-                    aria-label="toggle table display" 
-                    checked={tableDisplay} 
-                    onClick={() => setTableDisplay(!tableDisplay)}
-                    />} label={tableDisplay?"Table View":"Card View"} />
-            </FormGroup>
+            <SearchBox searchTerm={searchTerm} handleSearch={handleSearch} />
+            {/* <TextField 
+                placeholder="search" 
+                variant="outlined" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                ></TextField> */}
+            <Box component="form" sx={{'& > :not(style)' : {m:1, width: '25ch'},}}>
+                <FormGroup >
+                    <FormControlLabel control={
+                    <Switch
+                        aria-label="toggle table display" 
+                        checked={tableDisplay} 
+                        onClick={() => setTableDisplay(!tableDisplay)}
+                        />} label={tableDisplay?"Table View":"Card View"} />
+                </FormGroup>
+            </Box>
 
             {tableDisplay?
                 <TableDisplay />
