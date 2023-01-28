@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ChangeEventHandler, FormEvent, useState } from "react";
 
 import { Add, Delete } from "@mui/icons-material";
 import { TableContainer, Table, TableBody, TableCell,  TableRow, Paper, TextField, Button } from "@mui/material";
@@ -33,6 +33,19 @@ const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
             setIngredients(ingredients.filter((i) => i.RecipeIngredientID !== idToDelete))
     }
 
+    const handleQuantityField: ChangeEventHandler<HTMLInputElement> = (event) => {
+        console.log(event.target.id, event.target.value)
+        const id = Number(event.target.id);
+        const value = Number(event.target.value);
+        setIngredients(
+            ingredients.map(
+            (ingredient) => {
+                return {...ingredient, Quantity: ingredient.RecipeIngredientID===id?value:ingredient.Quantity}
+            }
+            )
+        )
+    }
+
     const style = {
         position: 'absolute' as 'absolute',
         top: '50%',
@@ -47,6 +60,7 @@ const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
         p: 4,
       };
 
+    
     return (
         <TableContainer component={Paper} variant="outlined">
             <Modal
@@ -93,7 +107,13 @@ const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
                         <TableRow key={ingredient.RecipeIngredientID}>
                             <TableCell>{ingredient.Name}</TableCell>
                             <TableCell>{ingredient.Category}</TableCell>
-                            <TableCell><TextField defaultValue={ingredient.Quantity} id={ingredient.RecipeIngredientID.toString()} variant="outlined" size="small"/></TableCell>
+                            <TableCell><TextField
+                                onChange={handleQuantityField}
+                                value={ingredient.Quantity} 
+                                id={ingredient.RecipeIngredientID.toString()} 
+                                variant="outlined" 
+                                size="small"
+                                /></TableCell>
                             <TableCell>
                                 <Button 
                                     onClick={() => deleteHandler(ingredient.RecipeIngredientID)}

@@ -12,14 +12,14 @@ import NutritionDetailsPane from "./recipe/NutritionDetails.component"
 
 const RecipeDetails = () => {
     // const [templateNutrition, setTemplateNutrition] = useState<TemplateNutrition[]>()
-    // const [ingredients, setIngredients] = useState<RecipeIngredient[]>()
-
+    
     const dispatch = useAppDispatch()
     const params = useParams()
     
     const thisRecipe = useAppSelector(selectOneRecipe(Number(params.recipe_id)))
     const ingredientsCatalog = useAppSelector(selectIngredientsCatalog)
     const templateNutrition = thisRecipe?.templates
+
     const ingredients = thisRecipe?.ingredients
 
     useEffect( () => {
