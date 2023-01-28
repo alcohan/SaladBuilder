@@ -104,8 +104,8 @@ export const { load } = recipeSlice.actions;
 export const selectRecipeStatus = (state:RootState) => state.recipes.status;
 
 export const selectRecipes = (state:RootState) => {
-    if(state.recipes.status === 'idle' && state.recipes.recipes.length ===0) {
-        store.dispatch(loadRecipes);
+    if(state.recipes.status === 'idle' && state.recipes.recipes.length === 0) {
+        store.dispatch(loadRecipes());
     }
     return state.recipes.recipes;
 }
