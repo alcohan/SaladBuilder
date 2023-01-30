@@ -1,3 +1,4 @@
+import { RecipeIngredientWithDeleteFlag } from "./routes/recipe/IngredientsDisplay.component";
 import { Category } from "./types/Ingredient.types";
 import { IngredientCatalog, Recipe, RecipeIngredient, TemplateNutrition } from "./types/Recipe.types";
 
@@ -28,6 +29,38 @@ export const createRecipeIngredient = async (recipeID: number, ingredientID: num
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(createRecipeIngredientData)
+    }
+    return await fetch(requestUrl(`/recipes/${recipeID}/ingredients`), requestOptions)
+}
+
+export const updateRecipeIngredients = async (recipeID: number, updatesArray: RecipeIngredientWithDeleteFlag[], originalData: RecipeIngredient[]) => {
+
+    const updateIngredientData = updatesArray.map( (item) => {
+        
+        const updateType= 
+            item.RecipeIngredientID===0 && !item.deleteFlag?
+            "create"
+            :
+            item.deleteFlag?
+                "delete"
+                :
+                item.Quantity != originalData.find(e => e.RecipeIngredientID===item.RecipeIngredientID)?.Quantity? 
+                    "update"
+                    :
+                    "nothing"
+
+        return ({
+            RecipeIngredientID: item.RecipeIngredientID,
+            Quantity: item.Quantity,
+            IngredientID: item.IngredientID,
+            updateType: updateType
+        })
+    })
+    
+    const requestOptions = {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(updateIngredientData)
     }
     return await fetch(requestUrl(`/recipes/${recipeID}/ingredients`), requestOptions)
 }

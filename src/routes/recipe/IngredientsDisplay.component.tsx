@@ -1,16 +1,24 @@
 import { ChangeEventHandler, FormEvent, useState } from "react";
 
-import { Add, Delete } from "@mui/icons-material";
-import { TableContainer, Table, TableBody, TableCell,  TableRow, Paper, TextField, Button } from "@mui/material";
+import { Add, Delete, FindInPage } from "@mui/icons-material";
+import { TableContainer, Table, TableBody, TableCell,  TableRow, Paper, TextField, Button, Autocomplete } from "@mui/material";
 import { Modal, Box, Typography } from "@mui/material"
 
 import { RecipeIngredient, IngredientCatalog } from "../../types/Recipe.types";
-import { deleteRecipeIngredient } from "../../API";
+import { deleteRecipeIngredient, updateRecipeIngredients } from "../../API";
+import { useAppSelector } from "../../app/hooks";
+import { selectOneRecipe } from "../../app/store/recipeSlice";
+import RecipeIngredientRow from "./RecipeIngredientRow.component";
 
+
+export interface RecipeIngredientWithDeleteFlag extends RecipeIngredient {
+    deleteFlag?: boolean
+}
 interface IngredientsDisplayProps {
-    ingredients: RecipeIngredient[];
+    ingredients: RecipeIngredientWithDeleteFlag[];
     catalog: IngredientCatalog[];
     addIngredientHandler: (ingredientid: number) => Promise<number>;
+    RecipeID: number;
 }
 
 const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
@@ -18,6 +26,9 @@ const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
     const [modal, setModal] = useState(false)
     const handleOpen = () => setModal(true)
     const handleClose = () => setModal(false)
+
+    const [selectedItemToAdd, setSelectedItemToAdd] = useState<IngredientCatalog | null>(null)
+    const [selectedQtyToAdd, setSelectedQtyToAdd] = useState(1)
 
     // Get unique categories that are present in 'catalog'
     let categories: string[] = [];
@@ -27,14 +38,26 @@ const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
         }
     })    
 
+    const toggleDeleteFlag = (id:number) => {
+        const newIngredients = ingredients.map( 
+            (ingredient) => 
+            ingredient.RecipeIngredientID === id?
+            {...ingredient, deleteFlag:!ingredient.deleteFlag}
+            :ingredient
+            )
+        setIngredients(newIngredients)
+    }
     const deleteHandler = async (idToDelete: number) => {
         const response = await deleteRecipeIngredient(idToDelete);
         if (response.status === 200)
             setIngredients(ingredients.filter((i) => i.RecipeIngredientID !== idToDelete))
     }
+    const addIngredientTemp = (ingredient: IngredientCatalog, qty: number) => {
+        setIngredients(ingredients.concat({RecipeIngredientID: 0, Quantity: qty, ...ingredient}))
+    }
 
+    //When a quantity is changed, update our ingredients state
     const handleQuantityField: ChangeEventHandler<HTMLInputElement> = (event) => {
-        console.log(event.target.id, event.target.value)
         const id = Number(event.target.id);
         const value = Number(event.target.value);
         setIngredients(
@@ -46,24 +69,29 @@ const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
         )
     }
 
-    const style = {
-        position: 'absolute' as 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 400,
-        height: '80%',
-        overflow: 'scroll',
-        bgcolor: 'background.paper',
-        border: '2px solid #000',
-        boxShadow: 24,
-        p: 4,
-      };
+    const saveChanges = () => {
+        updateRecipeIngredients(props.RecipeID, ingredients, props.ingredients)
+    }
+
+    // Style for the modal 
+    // const style = {
+    //     position: 'absolute' as 'absolute',
+    //     top: '50%',
+    //     left: '50%',
+    //     transform: 'translate(-50%, -50%)',
+    //     width: 400,
+    //     height: '80%',
+    //     overflow: 'scroll',
+    //     bgcolor: 'background.paper',
+    //     border: '2px solid #000',
+    //     boxShadow: 24,
+    //     p: 4,
+    //   };
 
     
     return (
         <TableContainer component={Paper} variant="outlined">
-            <Modal
+            {/* <Modal
                 open={modal}
                 onClose={handleClose}
                 aria-labelledby="modal-modal-title"
@@ -99,33 +127,59 @@ const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
                         )}
                     </TableBody></Table>
                 </Box>
-            </Modal>
+            </Modal> */}
 
+            <Button variant="outlined" onClick={saveChanges}>Save</Button>
             <Table  aria-label="recipe ingredients">
                 <TableBody>
                     {ingredients.map( (ingredient) => (
-                        <TableRow key={ingredient.RecipeIngredientID}>
-                            <TableCell>{ingredient.Name}</TableCell>
-                            <TableCell>{ingredient.Category}</TableCell>
-                            <TableCell><TextField
-                                onChange={handleQuantityField}
-                                value={ingredient.Quantity} 
-                                id={ingredient.RecipeIngredientID.toString()} 
+                        <RecipeIngredientRow 
+                            key={ingredient.RecipeIngredientID}
+                            ingredient={ingredient} 
+                            handleQuantityField={handleQuantityField} 
+                            toggleDeleteFlag={toggleDeleteFlag} 
+                            />
+                    ))}
+
+                    {/* New Ingredient picker  */}
+                    <TableRow>
+                        <TableCell colSpan={2}>
+                            <Autocomplete 
+                                disablePortal
+                                id="add-ingredient-picker"
+                                size="small"
+                                value={selectedItemToAdd}
+                                onChange={(event: any, newValue) => setSelectedItemToAdd(newValue)}
+                                options={props.catalog}
+                                getOptionLabel={(option) => option.Name}
+                                getOptionDisabled={ (option) => ingredients.some(e => e.IngredientID === option.IngredientID)}
+                                groupBy={(option) => option.Category}
+                                renderInput={(params) => <TextField {...params} label="Add Ingredient" />}
+                                />
+                        </TableCell>
+                        <TableCell>
+                            <TextField
+                                value={selectedQtyToAdd}
+                                id="new-ingredient-qty"
+                                onChange={(e) => setSelectedQtyToAdd(Number(e.target.value))}
                                 variant="outlined" 
                                 size="small"
-                                /></TableCell>
-                            <TableCell>
-                                <Button 
-                                    onClick={() => deleteHandler(ingredient.RecipeIngredientID)}
-                                    aria-label="delete"
-                                    ><Delete />
-                                </Button>
-                            </TableCell>
-                        </TableRow>
-                    ))}
+                                />
+                        </TableCell>
+                        <TableCell>
+                            <Button 
+                                disabled={selectedItemToAdd === null || selectedQtyToAdd <= 0} 
+                                onClick={() => {
+                                    if(selectedItemToAdd) {
+                                        addIngredientTemp(selectedItemToAdd,selectedQtyToAdd);
+                                        setSelectedItemToAdd(null);
+                                        setSelectedQtyToAdd(1);
+                                    }}}
+                                ><Add/>Add</Button>
+                        </TableCell>
+                    </TableRow>
                 </TableBody>
             </Table>
-            <Button onClick={handleOpen} variant="outlined"><Add/>Add</Button>
         </TableContainer>
     )
 }

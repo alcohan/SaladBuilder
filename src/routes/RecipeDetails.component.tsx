@@ -58,14 +58,12 @@ const RecipeDetails = () => {
             }
             <h2>Ingredients</h2>
             {ingredients && ingredientsCatalog ?
-                <>
-                    <IngredientsDisplay ingredients={ingredients} catalog={ingredientsCatalog} addIngredientHandler={addIngredientHandler}/>
-                    {/* <Button variant="outlined" 
-                        onClick={() => 
-                            addIngredientHandler(11)
-                        }
-                        ><Add /> Add</Button> */}
-                </>
+                <IngredientsDisplay 
+                    ingredients={ingredients} 
+                    catalog={ingredientsCatalog} 
+                    addIngredientHandler={addIngredientHandler}
+                    RecipeID={Number(params.recipe_id)}
+                    />
                 :
                 <h2>Loading Ingredients...</h2>
             }
