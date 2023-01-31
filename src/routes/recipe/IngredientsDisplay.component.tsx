@@ -1,12 +1,12 @@
 import { ChangeEventHandler, useEffect, useState } from "react";
 
-import { Add } from "@mui/icons-material";
-import { TableContainer, Table, TableBody, TableCell,  TableRow, Paper, TextField, Button, Autocomplete } from "@mui/material";
+import { Add, CheckCircleOutline } from "@mui/icons-material";
+import { TableContainer, Table, TableBody, TableCell,  TableRow, Paper, TextField, Button, Autocomplete, CircularProgress } from "@mui/material";
 
 import { RecipeIngredient, IngredientCatalog } from "../../types/Recipe.types";
 import RecipeIngredientRow from "./RecipeIngredientRow.component";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { selectOneRecipe, selectRecipeStatus, updateRecipeIngredients } from "../../app/store/recipeSlice";
+import { selectOneRecipe, selectRecipeSaveStatus, selectRecipeStatus, updateRecipeIngredients } from "../../app/store/recipeSlice";
 
 
 export interface RecipeIngredientWithDeleteFlag extends RecipeIngredient {
@@ -17,16 +17,17 @@ interface IngredientsDisplayProps {
     ingredients: RecipeIngredientWithDeleteFlag[];
     catalog: IngredientCatalog[];
     RecipeID: number;
+    mode: 'recipe' | 'template';
 }
 
 const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
     const dispatch = useAppDispatch()
-    const status = useAppSelector(selectRecipeStatus)
-    const originalIngredients = useAppSelector(selectOneRecipe(props.RecipeID))!.ingredients
+    const saveStatus = useAppSelector(selectRecipeSaveStatus)
+    // const originalIngredients = useAppSelector(selectOneRecipe(props.RecipeID))!.ingredients
     // Local copy of the ingredients. We modify this to stage changes
-    const [ingredients, setIngredients] = useState<RecipeIngredientWithDeleteFlag[]>(originalIngredients)
+    const [ingredients, setIngredients] = useState<RecipeIngredientWithDeleteFlag[]>(props.ingredients)
 
-    useEffect( () => {setIngredients(originalIngredients)},[originalIngredients])
+    useEffect( () => {setIngredients(props.ingredients)},[props.ingredients])
 
     // State for the 'add item' autocomplete box
     const [selectedItemToAdd, setSelectedItemToAdd] = useState<IngredientCatalog | null>(null)
@@ -51,8 +52,9 @@ const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
     }
 
     // Add an ingredient to local state so that it can be saved later
+    // Use negative of the ingredientID so that it has a unique ID for now but the backend knows it needs to be created
     const addIngredientTemp = (ingredient: IngredientCatalog, qty: number) => {
-        setIngredients(ingredients.concat({RecipeIngredientID: 0, Quantity: qty, ...ingredient}))
+        setIngredients(ingredients.concat({RecipeIngredientID: -ingredient.IngredientID, Quantity: qty, ...ingredient}))
     }
 
     // When a quantity is changed, update our ingredients state
@@ -73,17 +75,27 @@ const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
         dispatch(updateRecipeIngredients({
             recipe_id: props.RecipeID, 
             dataToUpdate: ingredients, 
-            originalData: originalIngredients
+            originalData: props.ingredients
         }))
     }
     
     return (
         <TableContainer component={Paper}>
             <Button 
-                variant="outlined" 
+                variant="contained" 
                 onClick={saveChanges}
+                disabled={saveStatus==='loading' || saveStatus==='success'}
                 >
-                Save</Button> status: {status}
+                    {
+                        saveStatus==='loading' ?
+                        (<CircularProgress color="inherit" size={24} />)
+                        :
+                        saveStatus==='success' ?
+                        (<CheckCircleOutline />)
+                        :
+                        "Save"
+                    }
+                </Button>
 
             <Table  aria-label="recipe ingredients">
                 <TableBody>
@@ -105,7 +117,10 @@ const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
                                 size="small"
                                 value={selectedItemToAdd}
                                 onChange={(event: any, newValue) => setSelectedItemToAdd(newValue)}
-                                options={props.catalog}
+                                options={props.catalog.filter(i => {
+                                    if (props.mode==='recipe') return i.CategoryID != 1;
+                                    if (props.mode==='template') return i.CategoryID === 1;
+                                })}
                                 getOptionLabel={(option) => option.Name}
                                 getOptionDisabled={ (option) => ingredients.some(e => e.IngredientID === option.IngredientID)}
                                 groupBy={(option) => option.Category}

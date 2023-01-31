@@ -36,9 +36,9 @@ export const createRecipeIngredient = async (recipeID: number, ingredientID: num
 export const putRecipeIngredients = async (recipeID: number, updatesArray: RecipeIngredientWithDeleteFlag[], originalData: RecipeIngredient[]) => {
 
     const updateIngredientData = updatesArray.map( (item) => {
-        
+        // If it's been assigned a temporary (<0) ID and isn't marked to delete, then create
         const updateType= 
-            item.RecipeIngredientID===0 && !item.deleteFlag?
+            item.RecipeIngredientID <= 0 && !item.deleteFlag?
             "create"
             :
             item.deleteFlag?
@@ -76,6 +76,14 @@ export const fetchIngredientsCatalog = () => {
 export const fetchRecipes = () => {
     return new Promise<Recipe[]> ((resolve) =>
     fetch(requestUrl(`/recipes`))
+        .then(response => response.json())
+        .then(data => resolve(data as Recipe[]))
+    )
+    
+}
+export const fetchTemplates = () => {
+    return new Promise<Recipe[]> ((resolve) =>
+    fetch(requestUrl(`/recipes/templates`))
         .then(response => response.json())
         .then(data => resolve(data as Recipe[]))
     )

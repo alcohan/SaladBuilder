@@ -1,8 +1,63 @@
-import React from "react"
+import { useNavigate } from "react-router";
+
+import { Avatar, Card, CardContent, CardMedia, Typography } from '@mui/material'
+import { Grid } from '@mui/material'
+
+import { Recipe } from '../types/Recipe.types';
+import { useAppSelector } from "../app/hooks";
+import { selectTemplates } from "../app/store/templateSlice";
 
 const TemplatesPage = () => {
+    const templates = useAppSelector(selectTemplates);
+
+    const navigate = useNavigate()
+
+    const RecipeCard = (props: Recipe) => {
+        return (
+            <Card variant="outlined" onClick={() => navigate(`/templates/${props.RecipeID}`)}>
+                <Grid container>
+                    <Grid item xs={8}>
+                        <CardContent>
+                            <Typography gutterBottom variant="h5" component="h2">
+                                {props.Name}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                Base price $ {props.Price.toFixed(2)}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                {props.IngredientQty} Ingredients
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                {props.Calories} cal
+                            </Typography>
+                        </CardContent>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <Avatar component={CardMedia}
+                            src={props.ImageURL? props.ImageURL : "localhost/error.jpg"} 
+                            alt={props.Name} 
+                            sx={{width:80, height:80, m:1}}
+                            />
+                    </Grid>
+                </Grid>
+            </Card>
+        )
+    }
+
     return(
-        <h1>This is the Templates page</h1>
+        <>          
+            <Typography variant="h3" component="h1" gutterBottom>
+                Templates
+            </Typography>
+
+            <Grid container spacing={3}>
+                {templates.map( (recipe: Recipe) => (
+                    <Grid key={recipe.RecipeID} item xs={12} sm={6} md={4} lg={3} xl={2}>
+                        <RecipeCard {...recipe} />
+                    </Grid>
+                ))}           
+            </Grid>
+        </>
     )
 }
 

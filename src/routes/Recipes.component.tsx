@@ -1,13 +1,11 @@
-import { useEffect } from "react"
 import { useNavigate } from "react-router";
 
 import { Avatar, Card, CardContent, CardMedia, Typography } from '@mui/material'
 import { Grid } from '@mui/material'
 
 import { Recipe } from '../types/Recipe.types';
-import { useAppDispatch } from "../app/hooks";
 import { useAppSelector } from "../app/hooks";
-import { loadRecipes, selectRecipes } from "../app/store/recipeSlice";
+import { selectRecipes } from "../app/store/recipeSlice";
 
 const RecipesPage = () => {
     const recipes = useAppSelector(selectRecipes);
@@ -30,7 +28,7 @@ const RecipesPage = () => {
                                 {props.IngredientQty} Ingredients
                             </Typography>
                             <Typography variant="body2" color="textSecondary" component="p">
-                                Base ingredients {props.Calories.toFixed(0)} cal
+                                {props.Calories} cal
                             </Typography>
                         </CardContent>
                     </Grid>
@@ -40,13 +38,6 @@ const RecipesPage = () => {
                             alt={props.Name} 
                             sx={{width:80, height:80, m:1}}
                             />
-                        {/* <CardMedia
-                            component="img"
-                            alt="thumbnail"
-                            image={props.ImageURL}
-                            title={props.Name}
-                            // height="140"
-                            /> */}
                     </Grid>
                 </Grid>
             </Card>

@@ -11,12 +11,14 @@ interface RecipeWithTemplates extends Recipe {
 }
 export interface RecipeState {
     recipes: RecipeWithTemplates[];
-    status: 'idle' | 'loading' | 'failed';
+    status: 'idle' | 'loading' | 'failed' | 'success';
+    saveStatus: 'idle' | 'loading' | 'failed' | 'success';
 }
 
 const initialState: RecipeState = {
     recipes: [],
     status: 'idle',
+    saveStatus: 'idle',
 };
 
 // This Thunk loads the base recipe data and returns result as action payload
@@ -119,20 +121,27 @@ export const recipeSlice = createSlice({
 
             // update ingredients with a new payload
             .addCase(updateRecipeIngredients.pending, (state) => {
-                state.status = 'loading'
+                state.saveStatus = 'loading'
             })
             .addCase(updateRecipeIngredients.fulfilled, (state) => {
-                state.status = 'idle';
+                state.saveStatus = 'success';
+                setTimeout(() => {
+                    store.dispatch({type:'RESET_SAVE_STATUS'});
+                },3000)
             })
+            .addCase('RESET_SAVE_STATUS', (state) => {state.saveStatus='idle'})
             .addCase(updateRecipeIngredients.rejected, (state) => {
-                state.status = 'failed';
+                state.saveStatus = 'failed';
             })
     },
 });
 
 export const { load } = recipeSlice.actions;
 
+// data loading status
 export const selectRecipeStatus = (state:RootState) => state.recipes.status;
+// data saving status
+export const selectRecipeSaveStatus = (state:RootState) => state.recipes.saveStatus;
 
 export const selectRecipes = (state:RootState) => {
     if(state.recipes.status === 'idle' && state.recipes.recipes.length === 0) {
