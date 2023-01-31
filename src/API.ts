@@ -33,7 +33,7 @@ export const createRecipeIngredient = async (recipeID: number, ingredientID: num
     return await fetch(requestUrl(`/recipes/${recipeID}/ingredients`), requestOptions)
 }
 
-export const updateRecipeIngredients = async (recipeID: number, updatesArray: RecipeIngredientWithDeleteFlag[], originalData: RecipeIngredient[]) => {
+export const putRecipeIngredients = async (recipeID: number, updatesArray: RecipeIngredientWithDeleteFlag[], originalData: RecipeIngredient[]) => {
 
     const updateIngredientData = updatesArray.map( (item) => {
         

@@ -1,8 +1,9 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, store } from '../store';
 
-import { fetchRecipeIngredients, fetchRecipes, fetchRecipeTemplateData } from '../../API';
+import { fetchRecipeIngredients, fetchRecipes, fetchRecipeTemplateData, putRecipeIngredients } from '../../API';
 import { Recipe, RecipeIngredient, TemplateNutrition } from '../../types/Recipe.types';
+import { RecipeIngredientWithDeleteFlag } from '../../routes/recipe/IngredientsDisplay.component';
 
 interface RecipeWithTemplates extends Recipe {
     templates?: TemplateNutrition[];
@@ -34,6 +35,23 @@ export const loadTemplateData = createAsyncThunk(
 export const loadRecipeIngredients = createAsyncThunk(
     'recipes/loadingredients',
     async (recipe_id: number) => await fetchRecipeIngredients(recipe_id)
+)
+
+interface UpdateIngredientsPayload {
+    recipe_id: number;
+    dataToUpdate: RecipeIngredientWithDeleteFlag[];
+    originalData: RecipeIngredient[];
+}
+export const updateRecipeIngredients = createAsyncThunk(
+    'recipes/updateingredients',
+    async (payload: UpdateIngredientsPayload) => {
+        const { recipe_id, dataToUpdate, originalData } = payload
+        const result = await putRecipeIngredients(recipe_id, dataToUpdate, originalData)
+        store.dispatch(loadRecipeIngredients(recipe_id))
+        store.dispatch(loadTemplateData(recipe_id))
+
+        return result
+    }
 )
 
 export const recipeSlice = createSlice({
@@ -94,6 +112,17 @@ export const recipeSlice = createSlice({
                 } else state.status = 'failed'
             })
             .addCase(loadRecipeIngredients.rejected, (state) => {
+                state.status = 'failed';
+            })
+
+            // update ingredients with a new payload
+            .addCase(updateRecipeIngredients.pending, (state) => {
+                state.status = 'loading'
+            })
+            .addCase(updateRecipeIngredients.fulfilled, (state) => {
+                state.status = 'idle';
+            })
+            .addCase(updateRecipeIngredients.rejected, (state) => {
                 state.status = 'failed';
             })
     },

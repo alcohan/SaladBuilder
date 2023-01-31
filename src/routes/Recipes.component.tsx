@@ -55,7 +55,7 @@ const RecipesPage = () => {
 
     return(
         <>          
-            <Typography variant="h3">
+            <Typography variant="h3" component="h1" gutterBottom>
                 Recipes
             </Typography>
 

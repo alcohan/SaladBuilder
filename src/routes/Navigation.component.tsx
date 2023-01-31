@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router';
 import { useNavigate } from 'react-router';
 
-import { AppBar, Toolbar, IconButton, Typography } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography, Paper } from '@mui/material';
 import { Drawer, List, ListItem, ListItemText } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
@@ -59,7 +59,9 @@ const Navigation = () => {
         <>
             <NavigationBar />
             <AppDrawer />
-            <Outlet />
+            <Paper sx={{m:4}}>
+                <Outlet />
+            </Paper>
         </>
     )
 }

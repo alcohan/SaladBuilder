@@ -1,19 +1,18 @@
-import { ChangeEventHandler, FormEvent, useState } from "react";
+import { ChangeEventHandler, useState } from "react";
 
-import { Add, Delete, FindInPage } from "@mui/icons-material";
+import { Add } from "@mui/icons-material";
 import { TableContainer, Table, TableBody, TableCell,  TableRow, Paper, TextField, Button, Autocomplete } from "@mui/material";
-import { Modal, Box, Typography } from "@mui/material"
 
 import { RecipeIngredient, IngredientCatalog } from "../../types/Recipe.types";
-import { deleteRecipeIngredient, updateRecipeIngredients } from "../../API";
-import { useAppSelector } from "../../app/hooks";
-import { selectOneRecipe } from "../../app/store/recipeSlice";
 import RecipeIngredientRow from "./RecipeIngredientRow.component";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { selectOneRecipe, selectRecipeStatus, updateRecipeIngredients } from "../../app/store/recipeSlice";
 
 
 export interface RecipeIngredientWithDeleteFlag extends RecipeIngredient {
     deleteFlag?: boolean
 }
+
 interface IngredientsDisplayProps {
     ingredients: RecipeIngredientWithDeleteFlag[];
     catalog: IngredientCatalog[];
@@ -22,11 +21,13 @@ interface IngredientsDisplayProps {
 }
 
 const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
+    const dispatch = useAppDispatch()
+    const status = useAppSelector(selectRecipeStatus)
+    // const originalIngredients = useAppSelector(selectOneRecipe(props.RecipeID))!.ingredients
+    // Local copy of the ingredients. We modify this to stage changes
     const [ingredients, setIngredients] = useState(props.ingredients)
-    const [modal, setModal] = useState(false)
-    const handleOpen = () => setModal(true)
-    const handleClose = () => setModal(false)
 
+    // State for the 'add item' autocomplete box
     const [selectedItemToAdd, setSelectedItemToAdd] = useState<IngredientCatalog | null>(null)
     const [selectedQtyToAdd, setSelectedQtyToAdd] = useState(1)
 
@@ -47,16 +48,13 @@ const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
             )
         setIngredients(newIngredients)
     }
-    const deleteHandler = async (idToDelete: number) => {
-        const response = await deleteRecipeIngredient(idToDelete);
-        if (response.status === 200)
-            setIngredients(ingredients.filter((i) => i.RecipeIngredientID !== idToDelete))
-    }
+
+    // Add an ingredient to local state so that it can be saved later
     const addIngredientTemp = (ingredient: IngredientCatalog, qty: number) => {
         setIngredients(ingredients.concat({RecipeIngredientID: 0, Quantity: qty, ...ingredient}))
     }
 
-    //When a quantity is changed, update our ingredients state
+    // When a quantity is changed, update our ingredients state
     const handleQuantityField: ChangeEventHandler<HTMLInputElement> = (event) => {
         const id = Number(event.target.id);
         const value = Number(event.target.value);
@@ -69,67 +67,23 @@ const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
         )
     }
 
+    // Send our updated state to the API handler
     const saveChanges = () => {
-        updateRecipeIngredients(props.RecipeID, ingredients, props.ingredients)
+        dispatch(updateRecipeIngredients({
+            recipe_id: props.RecipeID, 
+            dataToUpdate: ingredients, 
+            originalData: props.ingredients
+        }))
     }
-
-    // Style for the modal 
-    // const style = {
-    //     position: 'absolute' as 'absolute',
-    //     top: '50%',
-    //     left: '50%',
-    //     transform: 'translate(-50%, -50%)',
-    //     width: 400,
-    //     height: '80%',
-    //     overflow: 'scroll',
-    //     bgcolor: 'background.paper',
-    //     border: '2px solid #000',
-    //     boxShadow: 24,
-    //     p: 4,
-    //   };
-
     
     return (
-        <TableContainer component={Paper} variant="outlined">
-            {/* <Modal
-                open={modal}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
+        <TableContainer component={Paper}>
+            <Button 
+                variant="outlined" 
+                onClick={saveChanges}
                 >
-                <Box sx={style}>
-                    <Typography id="modal-modal-title" variant="h6" component="h2">
-                        Add Ingredients
-                    </Typography>
-                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                    </Typography>
-                    <Table><TableBody>
-                        {categories.map(category => 
-                            category==="General"?
-                                null
-                                :
-                                (<>
-                                    <TableRow><TableCell colSpan={2} align="center"><Typography variant="h6">{category}</Typography></TableCell></TableRow>
-                                    {props.catalog.map( ingredient => 
-                                        ingredient.Category === category? (
-                                            <TableRow>
-                                                <TableCell><Button onClick={() => {
-                                                    props.addIngredientHandler(ingredient.IngredientID)
-                                                    }}><Add/></Button></TableCell>
-                                                <TableCell>{ingredient.Name}</TableCell>
-                                            </TableRow>
-                                            )
-                                            :null
-                                    )}
-                                </>
-                                )
-                            
-                        )}
-                    </TableBody></Table>
-                </Box>
-            </Modal> */}
+                Save</Button> status: {status}
 
-            <Button variant="outlined" onClick={saveChanges}>Save</Button>
             <Table  aria-label="recipe ingredients">
                 <TableBody>
                     {ingredients.map( (ingredient) => (

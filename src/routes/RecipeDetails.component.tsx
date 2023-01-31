@@ -1,4 +1,5 @@
-import { Avatar, Typography } from "@mui/material"
+import { ExpandMore } from "@mui/icons-material"
+import { Accordion, AccordionDetails, AccordionSummary, Avatar, Paper, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useParams } from "react-router"
 
@@ -42,7 +43,7 @@ const RecipeDetails = () => {
 
     return(
         <>
-            <Typography variant="h3" component="h1">
+            <Typography variant="h3" component="h1" gutterBottom>
                 {thisRecipe?.Name}
                 <Avatar onClick={() => window.prompt("This will eventually update image url: ")}
                     alt={thisRecipe?.Name} 
@@ -50,23 +51,47 @@ const RecipeDetails = () => {
                     sx={{width:120, height:120}}
                     />
             </Typography>
-            <h2>Nutrition</h2>
-            {templateNutrition && thisRecipe ?
-                <NutritionDetailsPane templates={templateNutrition} Name={thisRecipe?.Name} />
-                :
-                <h2>Loading Nutrition...</h2>
-            }
-            <h2>Ingredients</h2>
-            {ingredients && ingredientsCatalog ?
-                <IngredientsDisplay 
-                    ingredients={ingredients} 
-                    catalog={ingredientsCatalog} 
-                    addIngredientHandler={addIngredientHandler}
-                    RecipeID={Number(params.recipe_id)}
-                    />
-                :
-                <h2>Loading Ingredients...</h2>
-            }
+            <Accordion>
+                <AccordionSummary
+                    expandIcon={<ExpandMore />}
+                    aria-controls="nutrition-content"
+                    id="nutrition-header"
+                    >
+                    <Typography variant="h4" component="h2" justifySelf={"center"}>Nutrition</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    {templateNutrition && thisRecipe ?
+                        <NutritionDetailsPane
+                        templates={templateNutrition}
+                        Name={thisRecipe?.Name} />
+                        :
+                        <h2>Loading Nutrition...</h2>
+                    }
+                </AccordionDetails>
+            </Accordion>
+
+            <Accordion
+                defaultExpanded={true}>
+                <AccordionSummary
+                    expandIcon={<ExpandMore />}
+                    aria-controls="ingredients-content"
+                    id="ingredients-header"
+                    >
+                    <Typography variant="h4" component="h2">Ingredients</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    {ingredients && ingredientsCatalog ?
+                        <IngredientsDisplay
+                            ingredients={ingredients}
+                            catalog={ingredientsCatalog}
+                            addIngredientHandler={addIngredientHandler}
+                            RecipeID={Number(params.recipe_id)}
+                            />
+                        :
+                        <h2>Loading Ingredients...</h2>
+                    }
+                </AccordionDetails>
+            </Accordion>
         </> 
 
     )
