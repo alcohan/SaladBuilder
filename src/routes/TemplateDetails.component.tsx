@@ -23,7 +23,6 @@ const TemplateDetails = () => {
     }
     ,[])
 
-    console.log(thisRecipe)
     return(
         <>
             <Typography variant="h3" component="h1" gutterBottom>
