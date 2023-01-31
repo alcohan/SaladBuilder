@@ -29,18 +29,6 @@ const RecipeDetails = () => {
     }
     ,[])
 
-    // Add a new ingredient to this recipe and return its new ID
-    const addIngredientHandler = async (ingredientID: number) => {
-        if (thisRecipe){
-            let result = await createRecipeIngredient(thisRecipe.RecipeID,ingredientID)
-                .then(result => result.json())
-            return result.new_id
-        }
-        else {
-            throw new Error("RecipeID is not loaded");
-        }
-    }
-
     return(
         <>
             <Typography variant="h3" component="h1" gutterBottom>
@@ -84,7 +72,6 @@ const RecipeDetails = () => {
                         <IngredientsDisplay
                             ingredients={ingredients}
                             catalog={ingredientsCatalog}
-                            addIngredientHandler={addIngredientHandler}
                             RecipeID={Number(params.recipe_id)}
                             />
                         :

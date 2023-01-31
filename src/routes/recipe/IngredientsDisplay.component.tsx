@@ -1,4 +1,4 @@
-import { ChangeEventHandler, useState } from "react";
+import { ChangeEventHandler, useEffect, useState } from "react";
 
 import { Add } from "@mui/icons-material";
 import { TableContainer, Table, TableBody, TableCell,  TableRow, Paper, TextField, Button, Autocomplete } from "@mui/material";
@@ -16,16 +16,17 @@ export interface RecipeIngredientWithDeleteFlag extends RecipeIngredient {
 interface IngredientsDisplayProps {
     ingredients: RecipeIngredientWithDeleteFlag[];
     catalog: IngredientCatalog[];
-    addIngredientHandler: (ingredientid: number) => Promise<number>;
     RecipeID: number;
 }
 
 const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
     const dispatch = useAppDispatch()
     const status = useAppSelector(selectRecipeStatus)
-    // const originalIngredients = useAppSelector(selectOneRecipe(props.RecipeID))!.ingredients
+    const originalIngredients = useAppSelector(selectOneRecipe(props.RecipeID))!.ingredients
     // Local copy of the ingredients. We modify this to stage changes
-    const [ingredients, setIngredients] = useState(props.ingredients)
+    const [ingredients, setIngredients] = useState<RecipeIngredientWithDeleteFlag[]>(originalIngredients)
+
+    useEffect( () => {setIngredients(originalIngredients)},[originalIngredients])
 
     // State for the 'add item' autocomplete box
     const [selectedItemToAdd, setSelectedItemToAdd] = useState<IngredientCatalog | null>(null)
@@ -72,7 +73,7 @@ const IngredientsDisplay: React.FC<IngredientsDisplayProps> = (props) => {
         dispatch(updateRecipeIngredients({
             recipe_id: props.RecipeID, 
             dataToUpdate: ingredients, 
-            originalData: props.ingredients
+            originalData: originalIngredients
         }))
     }
     
