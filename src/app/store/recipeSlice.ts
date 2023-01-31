@@ -6,8 +6,8 @@ import { Recipe, RecipeIngredient, TemplateNutrition } from '../../types/Recipe.
 import { RecipeIngredientWithDeleteFlag } from '../../routes/recipe/IngredientsDisplay.component';
 
 interface RecipeWithTemplates extends Recipe {
-    templates?: TemplateNutrition[];
-    ingredients?: RecipeIngredient[];
+    templates: TemplateNutrition[];
+    ingredients: RecipeIngredient[];
 }
 export interface RecipeState {
     recipes: RecipeWithTemplates[];
@@ -59,15 +59,16 @@ export const recipeSlice = createSlice({
     initialState,
     reducers: {
         load: (state, action: PayloadAction<Recipe[]>) => {
-            state.recipes = action.payload;
+            //add blank ingredients and templates
+            state.recipes = action.payload.map((r) => ({...r, 'ingredients':[], 'templates':[]}));
         },
-        loadtemplates: (state, action: PayloadAction<{id: number, data:TemplateNutrition[]}>) => {
-            const thisRecipe = state.recipes
-                .find((r) => r.RecipeID === action.payload.id);
-            if (thisRecipe) {
-                thisRecipe.templates = action.payload.data
-            } else state.status = 'failed'
-        }
+        // loadtemplates: (state, action: PayloadAction<{id: number, data:TemplateNutrition[]}>) => {
+        //     const thisRecipe = state.recipes
+        //         .find((r) => r.RecipeID === action.payload.id);
+        //     if (thisRecipe) {
+        //         thisRecipe.templates = action.payload.data
+        //     } else state.status = 'failed'
+        // }
     },
     extraReducers: (builder) => {
         builder
@@ -77,7 +78,8 @@ export const recipeSlice = createSlice({
             })
             .addCase(loadRecipes.fulfilled, (state, action) => {
                 state.status = 'idle';
-                state.recipes = action.payload;
+                // Add blank arrays under 'ingredients' and 'templates to satisfy the type
+                state.recipes = action.payload.map((r) => ({...r, 'ingredients':[], 'templates':[]}));
             })
             .addCase(loadRecipes.rejected, (state) => {
                 state.status = 'failed';
